@@ -1,0 +1,11 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "SkillSwapHub.API\\SkillSwapHub.API.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

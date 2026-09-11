@@ -1,0 +1,12 @@
+@SkillSwapHub_API_HostAddress = https://localhost:7121
+
+### Register User
+
+POST {{SkillSwapHub_API_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Sindhu",
+  "email": "sindhu@test.com",
+  "password": "Test@123"
+}

@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+   
+    <title>Profile - SkillSwap Hub</title>
+
+    <link rel="stylesheet" href="Style.css">
+    
+
+</head>
+
+<body>
+
+   
+    <header class="site-header">
+
+        <div class="navbar">
+
+            <a href="index.html" class="brand">
+                <span class="brand-icon">S</span>
+                <span>SkillSwap Hub</span>
+            </a>
+
+            <nav>
+                <a href="index.html">Home</a>
+                <a href="profile.html" class="active">Skills</a>
+                <a href="login.html">Login</a>
+                <a href="register.html" class="register-link">Get Started</a>
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <main class="profile-page">
+
+        <section class="profile-header-section">
+
+            <div>
+
+                <span class="section-label">MY ACCOUNT</span>
+
+                <h1>My Profile</h1>
+
+                <p>
+                    Manage your profile, skills and learning preferences.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <section class="profile-section">
+
+            <div class="section-title-row">
+
+                <div>
+                    <span class="section-label">PROFILE INFORMATION</span>
+
+                    <h2>Personal Details</h2>
+                </div>
+
+                <button type="button"
+                        id="editProfileButton"
+                        class="primary-button">
+                    Edit Profile
+                </button>
+
+            </div>
+
+
+            <p id="message" class="profile-message">
+                Loading profile...
+            </p>
+
+
+            <div id="profileDetails"
+                 class="profile-details">
+            </div>
+
+
+            <div id="editProfileForm"
+                 class="edit-profile-card"
+                 style="display: none;">
+
+                <div class="card-title">
+
+                    <h3>Edit Profile</h3>
+
+                    <p>
+                        Update your learning preferences and profile information.
+                    </p>
+
+                </div>
+
+
+                <div class="profile-form-grid">
+
+                    <div class="form-group full-width">
+
+                        <label for="bio">
+                            Bio
+                        </label>
+
+                        <input type="text"
+                               id="bio"
+                               placeholder="Tell others about yourself">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="experienceLevel">
+                            Experience Level
+                        </label>
+
+                        <input type="text"
+                               id="experienceLevel"
+                               placeholder="Beginner, Intermediate, Advanced">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="availability">
+                            Availability
+                        </label>
+
+                        <input type="text"
+                               id="availability"
+                               placeholder="Weekdays, Weekends, Evenings">
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="preferredSessionDuration">
+                            Preferred Session Duration
+                        </label>
+
+                        <input type="text"
+                               id="preferredSessionDuration"
+                               placeholder="30 minutes, 1 hour">
+
+                    </div>
+
+                </div>
+
+
+                <button type="button"
+                        id="saveProfileButton"
+                        class="primary-button">
+                    Save Profile
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-section skills-section">
+
+            <div class="section-title-row">
+
+                <div>
+
+                    <span class="section-label">SKILLS</span>
+
+                    <h2>My Skills</h2>
+
+                    <p>
+                        Add the skills you can teach or want to learn.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="skill-form-card">
+
+                <div class="form-group">
+
+                    <label for="skillSelect">
+                        Skill
+                    </label>
+
+                    <select id="skillSelect">
+
+                        <option value="">
+                            Select a skill
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="skillType">
+                        Skill Type
+                    </label>
+
+                    <select id="skillType">
+
+                        <option value="OFFER">
+                            I can teach
+                        </option>
+
+                        <option value="WANT">
+                            I want to learn
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="skillLevel">
+                        Skill Level
+                    </label>
+
+                    <select id="skillLevel">
+
+                        <option value="">
+                            Select level
+                        </option>
+
+                        <option value="Beginner">
+                            Beginner
+                        </option>
+
+                        <option value="Intermediate">
+                            Intermediate
+                        </option>
+
+                        <option value="Advanced">
+                            Advanced
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button type="button"
+                        id="addSkillButton"
+                        class="primary-button">
+                    Add Skill
+                </button>
+
+            </div>
+
+
+            <div id="mySkillsList" class="skills-grid">
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-section matches-section">
+
+            <div class="section-title-row">
+
+                <div>
+
+                    <span class="section-label">DISCOVER</span>
+
+                    <h2>Skill Matches</h2>
+
+                    <p>
+                        Find people who can help you learn the skills you want.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <p id="matchesMessage"
+               class="section-message">
+                Loading matches...
+            </p>
+
+
+            <div id="matchesList"
+                 class="matches-grid">
+            </div>
+
+        </section>
+
+
+        <section class="dashboard-section requests-section">
+
+            <div class="section-title-row">
+
+                <div>
+
+                    <span class="section-label">CONNECTIONS</span>
+
+                    <h2>Session Requests</h2>
+
+                    <p>
+                        Manage session requests received from other users.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <p id="requestsMessage"
+               class="section-message">
+                Loading requests...
+            </p>
+
+
+            <div id="requestsList"
+                 class="requests-grid">
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="site-footer">
+
+        <div class="footer-content">
+
+            <div>
+                <strong>SkillSwap Hub</strong>
+
+                <p>
+                    Learn. Share. Grow.
+                </p>
+            </div>
+
+            <p>
+                © 2026 SkillSwap Hub. All rights reserved.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+    <script src="app.js"></script>
+  
+
+</body>
+
+</html>
