@@ -100,5 +100,48 @@ namespace SkillSwapHub.API.Services
 
             return (user, tokenString);
         }
+
+        public async Task<string?> ForgotPasswordAsync(string email)
+        {
+            int? userId = await _userRepository.GetUserIdByEmailAsync(email);
+
+            if (userId == null)
+            {
+                return null;
+            }
+
+            string token = Guid.NewGuid().ToString("N");
+
+            DateTime expiresAt = DateTime.UtcNow.AddMinutes(15);
+
+            await _userRepository.SavePasswordResetTokenAsync(
+                userId.Value,
+                token,
+                expiresAt
+            );
+
+            return token;
+
+        }
+
+        public async Task<bool> ResetPasswordAsync(string token, string newPassword)
+        {
+            // 1. Get the user ID associated with the reset token
+            var userId = await _userRepository.GetUserIdByResetTokenAsync(token);
+
+            if (userId == null)
+                return false;
+
+            // 2. Hash the new password
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            // 3. Update the user's password
+            await _userRepository.UpdatePasswordAsync(userId.Value, passwordHash);
+
+            // 4. Mark the reset token as used
+            await _userRepository.MarkPasswordResetTokenAsUsedAsync(token);
+
+            return true;
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using SkillSwapHub.API.Repositories;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -136,6 +137,12 @@ builder.Services.AddScoped<
 
 builder.Services.AddScoped<
     SkillSwapHub.API.Repositories.SkillRepository>();
+
+builder.Services.AddScoped<SwapRequestRepository>();
+
+builder.Services.AddScoped<SessionRepository>();
+
+    builder.Services.AddScoped<ReviewRepository>();
 
 builder.Services.AddScoped<
     SkillSwapHub.API.Repositories.UserSkillRepository>();

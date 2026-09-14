@@ -13,7 +13,6 @@ namespace SkillSwapHub.API.Controllers
         public AuthController(AuthService authService)
         {
             _authService = authService;
-
         }
 
         [HttpPost("register")]
@@ -64,5 +63,41 @@ namespace SkillSwapHub.API.Controllers
                 email = result.User.Email
             });
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
+        {
+            var token = await _authService.ForgotPasswordAsync(request.Email);
+
+            if (token == null)
+            {
+                return NotFound(new
+                {
+                    message = "No account found with this email"
+                });
+            }
+
+            return Ok(new
+            {
+                message = "Password reset token generated successfully",
+                token = token
+            });
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+        {
+            var result = await _authService.ResetPasswordAsync(
+                request.Token,
+                request.NewPassword);
+
+            if (!result)
+            {
+                return BadRequest("Invalid or expired reset token.");
+            }
+
+            return Ok("Password reset successfully.");
+        }
     }
+
 }
