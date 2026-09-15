@@ -1,5 +1,4 @@
-﻿
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.Data.SqlClient;
 using SkillSwapHub.API.Data;
 using SkillSwapHub.API.Models;
 
@@ -71,45 +70,64 @@ namespace SkillSwapHub.API.Repositories
 
         // Get Upcoming Sessions
         public async Task<List<Session>> GetUpcomingSessionsAsync(
-            int userId)
+    int userId)
         {
             using var connection =
                 _dbConnectionFactory.CreateConnection();
 
             string query = @"
-                SELECT
-                    s.SessionId,
-                    s.SessionRequestId,
-                    s.ScheduledDate,
-                    s.StartTime,
-                    s.DurationMinutes,
-                    s.MeetingLink,
-                    s.TeacherJoinedAt,
-                    s.LearnerJoinedAt,
-                    s.TeacherCompleted,
-                    s.LearnerCompleted,
-                    s.Status,
-                    s.CreatedAt,
-                    s.UpdatedAt
+        SELECT
+            s.SessionId,
+            s.SessionRequestId,
+            sr.RequesterUserId,
+            sr.ReceiverUserId,
+            s.ScheduledDate,
+            s.StartTime,
+            s.DurationMinutes,
+            s.MeetingLink,
+            s.TeacherJoinedAt,
+            s.LearnerJoinedAt,
 
-                FROM Sessions s
+            CASE
+                WHEN sr.RequesterUserId = @UserId
+                    THEN s.LearnerJoinedAt
+                WHEN sr.ReceiverUserId = @UserId
+                    THEN s.TeacherJoinedAt
+            END AS CurrentUserJoinedAt,
 
-                INNER JOIN SessionRequests sr
-                    ON s.SessionRequestId =
-                       sr.SessionRequestId
+            CASE
+                WHEN sr.RequesterUserId = @UserId
+                    THEN s.LearnerCompleted
+                WHEN sr.ReceiverUserId = @UserId
+                    THEN s.TeacherCompleted
+            END AS CurrentUserCompleted,
 
-                WHERE
-                    (
-                        sr.RequesterUserId = @UserId
-                        OR sr.ReceiverUserId = @UserId
-                    )
-                    AND s.ScheduledDate >=
-                        CAST(GETDATE() AS DATE)
-                    AND s.Status = 'SCHEDULED'
+            s.TeacherCompleted,
+            s.LearnerCompleted,
+            s.Status,
+            s.CreatedAt,
+            s.UpdatedAt
 
-                ORDER BY
-                    s.ScheduledDate,
-                    s.StartTime";
+        FROM Sessions s
+
+        INNER JOIN SessionRequests sr
+            ON s.SessionRequestId =
+               sr.SessionRequestId
+
+        WHERE
+            (
+                sr.RequesterUserId = @UserId
+                OR sr.ReceiverUserId = @UserId
+            )
+            AND s.ScheduledDate >=
+                CAST(GETDATE() AS DATE)
+
+            AND s.Status IN
+                ('SCHEDULED', 'IN_PROGRESS')
+
+        ORDER BY
+            s.ScheduledDate,
+            s.StartTime";
 
             using var command =
                 new SqlCommand(query, connection);
@@ -123,7 +141,8 @@ namespace SkillSwapHub.API.Repositories
             using var reader =
                 await command.ExecuteReaderAsync();
 
-            var sessions = new List<Session>();
+            var sessions =
+                new List<Session>();
 
             while (await reader.ReadAsync())
             {
@@ -135,46 +154,192 @@ namespace SkillSwapHub.API.Repositories
                     SessionRequestId =
                         reader.GetInt32(1),
 
+                    RequesterUserId =
+                        reader.GetInt32(2),
+
+                    ReceiverUserId =
+                        reader.GetInt32(3),
+
                     ScheduledDate =
-                        reader.GetDateTime(2),
+                        reader.GetDateTime(4),
 
                     StartTime =
-                        reader.GetTimeSpan(3),
+                        reader.GetTimeSpan(5),
 
                     DurationMinutes =
-                        reader.GetInt32(4),
+                        reader.GetInt32(6),
 
                     MeetingLink =
-                        reader.IsDBNull(5)
-                            ? null
-                            : reader.GetString(5),
-
-                    TeacherJoinedAt =
-                        reader.IsDBNull(6)
-                            ? null
-                            : reader.GetDateTime(6),
-
-                    LearnerJoinedAt =
                         reader.IsDBNull(7)
                             ? null
-                            : reader.GetDateTime(7),
+                            : reader.GetString(7),
+
+                    TeacherJoinedAt =
+                        reader.IsDBNull(8)
+                            ? null
+                            : reader.GetDateTime(8),
+
+                    LearnerJoinedAt =
+                        reader.IsDBNull(9)
+                            ? null
+                            : reader.GetDateTime(9),
+
+                    CurrentUserJoinedAt =
+                        reader.IsDBNull(10)
+                            ? null
+                            : reader.GetDateTime(10),
+
+                    CurrentUserCompleted =
+                        reader.IsDBNull(11)
+                            ? false
+                            : reader.GetBoolean(11),
 
                     TeacherCompleted =
-                        reader.GetBoolean(8),
+                        reader.GetBoolean(12),
 
                     LearnerCompleted =
-                        reader.GetBoolean(9),
+                        reader.GetBoolean(13),
 
                     Status =
-                        reader.GetString(10),
+                        reader.GetString(14),
 
                     CreatedAt =
-                        reader.GetDateTime(11),
+                        reader.GetDateTime(15),
 
                     UpdatedAt =
-                        reader.IsDBNull(12)
+                        reader.IsDBNull(16)
                             ? null
-                            : reader.GetDateTime(12)
+                            : reader.GetDateTime(16)
+                });
+            }
+
+            return sessions;
+        }
+
+        public async Task<List<Session>> GetCompletedSessionsAsync(int userId)
+        {
+            using var connection =
+                _dbConnectionFactory.CreateConnection();
+
+            string query = @"
+        SELECT
+            s.SessionId,
+            s.SessionRequestId,
+            sr.RequesterUserId,
+            sr.ReceiverUserId,
+            s.ScheduledDate,
+            s.StartTime,
+            s.DurationMinutes,
+            s.MeetingLink,
+            s.TeacherJoinedAt,
+            s.LearnerJoinedAt,
+
+            CASE
+                WHEN sr.RequesterUserId = @UserId
+                    THEN s.LearnerCompleted
+                WHEN sr.ReceiverUserId = @UserId
+                    THEN s.TeacherCompleted
+            END AS CurrentUserCompleted,
+
+            s.TeacherCompleted,
+            s.LearnerCompleted,
+            s.Status,
+            s.CreatedAt,
+            s.UpdatedAt
+
+        FROM Sessions s
+
+        INNER JOIN SessionRequests sr
+            ON s.SessionRequestId =
+               sr.SessionRequestId
+
+        WHERE
+            (
+                sr.RequesterUserId = @UserId
+                OR sr.ReceiverUserId = @UserId
+            )
+            AND s.Status = 'COMPLETED'
+
+        ORDER BY
+            s.ScheduledDate DESC,
+            s.StartTime DESC";
+
+            using var command =
+                new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue(
+                "@UserId",
+                userId);
+
+            await connection.OpenAsync();
+
+            using var reader =
+                await command.ExecuteReaderAsync();
+
+            var sessions =
+                new List<Session>();
+
+            while (await reader.ReadAsync())
+            {
+                sessions.Add(new Session
+                {
+                    SessionId =
+                        reader.GetInt32(0),
+
+                    SessionRequestId =
+                        reader.GetInt32(1),
+
+                    RequesterUserId =
+                        reader.GetInt32(2),
+
+                    ReceiverUserId =
+                        reader.GetInt32(3),
+
+                    ScheduledDate =
+                        reader.GetDateTime(4),
+
+                    StartTime =
+                        reader.GetTimeSpan(5),
+
+                    DurationMinutes =
+                        reader.GetInt32(6),
+
+                    MeetingLink =
+                        reader.IsDBNull(7)
+                            ? null
+                            : reader.GetString(7),
+
+                    TeacherJoinedAt =
+                        reader.IsDBNull(8)
+                            ? null
+                            : reader.GetDateTime(8),
+
+                    LearnerJoinedAt =
+                        reader.IsDBNull(9)
+                            ? null
+                            : reader.GetDateTime(9),
+
+                    CurrentUserCompleted =
+                        reader.IsDBNull(10)
+                            ? false
+                            : reader.GetBoolean(10),
+
+                    TeacherCompleted =
+                        reader.GetBoolean(11),
+
+                    LearnerCompleted =
+                        reader.GetBoolean(12),
+
+                    Status =
+                        reader.GetString(13),
+
+                    CreatedAt =
+                        reader.GetDateTime(14),
+
+                    UpdatedAt =
+                        reader.IsDBNull(15)
+                            ? null
+                            : reader.GetDateTime(15)
                 });
             }
 
@@ -222,6 +387,7 @@ namespace SkillSwapHub.API.Repositories
                                     AND s.TeacherJoinedAt IS NOT NULL
                                 )
                             THEN 'IN_PROGRESS'
+
                             ELSE s.Status
                         END,
 
@@ -233,13 +399,18 @@ namespace SkillSwapHub.API.Repositories
                     ON s.SessionRequestId =
                        sr.SessionRequestId
 
-                WHERE s.SessionId = @SessionId
-                  AND
-                  (
-                      sr.RequesterUserId = @UserId
-                      OR
-                      sr.ReceiverUserId = @UserId
-                  )";
+                WHERE
+                    s.SessionId = @SessionId
+
+                    AND
+                    (
+                        sr.RequesterUserId = @UserId
+                        OR
+                        sr.ReceiverUserId = @UserId
+                    )
+
+                    AND s.Status IN
+                        ('SCHEDULED', 'IN_PROGRESS')";
 
             using var command =
                 new SqlCommand(query, connection);
@@ -262,6 +433,7 @@ namespace SkillSwapHub.API.Repositories
 
 
         // Complete Session
+        // Complete Session
         public async Task<bool> CompleteSessionAsync(
             int sessionId,
             int userId)
@@ -270,53 +442,66 @@ namespace SkillSwapHub.API.Repositories
                 _dbConnectionFactory.CreateConnection();
 
             string query = @"
-                UPDATE s
-                SET
-                    TeacherCompleted =
-                        CASE
-                            WHEN sr.ReceiverUserId = @UserId
-                            THEN 1
-                            ELSE s.TeacherCompleted
-                        END,
+        UPDATE s
+        SET
+            TeacherCompleted =
+                CASE
+                    WHEN sr.ReceiverUserId = @UserId
+                    THEN 1
+                    ELSE s.TeacherCompleted
+                END,
 
-                    LearnerCompleted =
-                        CASE
-                            WHEN sr.RequesterUserId = @UserId
-                            THEN 1
-                            ELSE s.LearnerCompleted
-                        END,
+            LearnerCompleted =
+                CASE
+                    WHEN sr.RequesterUserId = @UserId
+                    THEN 1
+                    ELSE s.LearnerCompleted
+                END,
 
-                    Status =
-                        CASE
-                            WHEN
-                                (
-                                    sr.ReceiverUserId = @UserId
-                                    AND s.LearnerCompleted = 1
-                                )
-                                OR
-                                (
-                                    sr.RequesterUserId = @UserId
-                                    AND s.TeacherCompleted = 1
-                                )
-                            THEN 'COMPLETED'
-                            ELSE s.Status
-                        END,
+            Status =
+                CASE
+                    WHEN
+                        (
+                            sr.ReceiverUserId = @UserId
+                            AND s.LearnerCompleted = 1
+                        )
+                        OR
+                        (
+                            sr.RequesterUserId = @UserId
+                            AND s.TeacherCompleted = 1
+                        )
+                    THEN 'COMPLETED'
 
-                    UpdatedAt = GETDATE()
+                    ELSE s.Status
+                END,
 
-                FROM Sessions s
+            UpdatedAt = GETDATE()
 
-                INNER JOIN SessionRequests sr
-                    ON s.SessionRequestId =
-                       sr.SessionRequestId
+        FROM Sessions s
 
-                WHERE s.SessionId = @SessionId
-                  AND
-                  (
-                      sr.RequesterUserId = @UserId
-                      OR
-                      sr.ReceiverUserId = @UserId
-                  )";
+        INNER JOIN SessionRequests sr
+            ON s.SessionRequestId =
+               sr.SessionRequestId
+
+        WHERE
+            s.SessionId = @SessionId
+
+            AND
+            (
+                sr.RequesterUserId = @UserId
+                OR sr.ReceiverUserId = @UserId
+            )
+
+            AND
+            (
+                (sr.RequesterUserId = @UserId
+                 AND s.LearnerJoinedAt IS NOT NULL)
+
+                OR
+
+                (sr.ReceiverUserId = @UserId
+                 AND s.TeacherJoinedAt IS NOT NULL)
+            )";
 
             using var command =
                 new SqlCommand(query, connection);
@@ -338,4 +523,3 @@ namespace SkillSwapHub.API.Repositories
         }
     }
 }
-

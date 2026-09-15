@@ -90,6 +90,25 @@ namespace SkillSwapHub.API.Controllers
             return Ok(sessions);
         }
 
+        [HttpGet("completed/{userId}")]
+        public async Task<IActionResult> GetCompletedSessions(int userId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int loggedInUserId = int.Parse(userIdClaim.Value);
+
+            // Make sure the logged-in user can only access their own sessions
+            if (loggedInUserId != userId)
+                return Unauthorized();
+
+            var sessions =
+                await _sessionRepository.GetCompletedSessionsAsync(userId);
+
+            return Ok(sessions);
+        }
 
         [HttpPost("{sessionId}/join")]
         public async Task<IActionResult> JoinSession(

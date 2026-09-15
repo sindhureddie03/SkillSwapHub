@@ -18,10 +18,16 @@
 
         public bool TeacherCompleted { get; set; }
         public bool LearnerCompleted { get; set; }
-
+        public DateTime? CurrentUserJoinedAt { get; set; }
         public string Status { get; set; } = "SCHEDULED";
 
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
+
+        public int RequesterUserId { get; set; }
+
+        public int ReceiverUserId { get; set; }
+
+        public bool CurrentUserCompleted { get; set; }
     }
 }

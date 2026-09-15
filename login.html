@@ -102,6 +102,10 @@
                                required>
                     </div>
 
+                    <div class="forgot-password-link">
+                        <a href="#" id="forgotPasswordLink">Forgot password?</a>
+                    </div>
+
 
                     <button type="submit"
                             class="auth-button">
@@ -127,6 +131,59 @@
             </div>
 
         </section>
+
+        <div id="forgotPasswordSection" style="display: none;">
+
+            <div class="auth-card">
+
+                <div class="auth-card-header">
+                    <h2>Reset Password</h2>
+                    <p>Enter your email address to reset your password.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="resetEmail">Email</label>
+
+                    <input type="email"
+                           id="resetEmail"
+                           placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+
+                    <input type="password"
+                           id="newPassword"
+                           placeholder="Enter new password">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+
+                    <input type="password"
+                           id="confirmPassword"
+                           placeholder="Confirm new password">
+                </div>
+
+                <button type="button"
+                        id="resetPasswordButton"
+                        class="auth-button">
+                    Reset Password
+                </button>
+
+                <p id="resetPasswordMessage"
+                   class="form-message">
+                </p>
+
+                <div class="auth-footer">
+                    <a href="#" id="backToLoginLink">
+                        Back to Login
+                    </a>
+                </div>
+
+            </div>
+
+        </div>
 
     </main>
 

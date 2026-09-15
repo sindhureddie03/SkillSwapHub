@@ -1,6 +1,9 @@
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using SkillSwapHub.API.Repositories;
+using SkillSwapHub.API.Handlers.Commands.Skills;
+using SkillSwapHub.API.Handlers.Queries.Skills;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -142,7 +145,7 @@ builder.Services.AddScoped<SwapRequestRepository>();
 
 builder.Services.AddScoped<SessionRepository>();
 
-    builder.Services.AddScoped<ReviewRepository>();
+builder.Services.AddScoped<ReviewRepository>();
 
 builder.Services.AddScoped<
     SkillSwapHub.API.Repositories.UserSkillRepository>();
@@ -153,6 +156,21 @@ builder.Services.AddScoped<
 
 builder.Services.AddScoped<
     SkillSwapHub.API.Repositories.SessionRequestRepository>();
+
+
+// ============================================================
+// CQRS - Skill Handlers
+// ============================================================
+
+builder.Services.AddScoped<CreateSkillCommandHandler>();
+
+builder.Services.AddScoped<GetAllSkillsQueryHandler>();
+
+builder.Services.AddScoped<GetSkillByIdQueryHandler>();
+
+builder.Services.AddScoped<UpdateSkillCommandHandler>();
+
+builder.Services.AddScoped<DeleteSkillCommandHandler>();
 
 
 // ============================================================
@@ -202,3 +220,4 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
+

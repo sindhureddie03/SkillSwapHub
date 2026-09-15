@@ -99,6 +99,26 @@ namespace SkillSwapHub.API.Controllers
 
             return Ok(reviews);
         }
+
+        [HttpGet("session/{sessionId}/mine")]
+        public async Task<IActionResult> HasReviewedSession(int sessionId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+                return Unauthorized();
+
+            int reviewerId = int.Parse(userIdClaim.Value);
+
+            bool exists = await _reviewRepository.HasReviewAsync(
+                sessionId,
+                reviewerId);
+
+            return Ok(new
+            {
+                exists = exists
+            });
+        }
     }
 
 

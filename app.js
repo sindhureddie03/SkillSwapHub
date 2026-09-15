@@ -1,4 +1,17 @@
-﻿const registerForm = document.getElementById("registerForm");
+﻿// ================= AUTHENTICATION CHECK =================
+const currentToken = sessionStorage.getItem("token");
+
+if (!currentToken) {
+    const currentPage = window.location.pathname;
+
+    if (
+        currentPage.includes("profile.html") ||
+        currentPage.includes("index.html")
+    ) {
+        window.location.href = "login.html";
+    }
+}
+const registerForm = document.getElementById("registerForm");
 
 if (registerForm) {
     registerForm.addEventListener("submit", async function (event) {
@@ -69,10 +82,10 @@ if (loginForm) {
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("userId", data.userId);
-                localStorage.setItem("name", data.name);
-                localStorage.setItem("email", data.email);
+                sessionStorage.setItem("token", data.token);
+                sessionStorage.setItem("userId", data.userId);
+                sessionStorage.setItem("name", data.name);
+                sessionStorage.setItem("email", data.email);
 
                 message.textContent =
                     "Login successful. Redirecting...";
@@ -103,7 +116,7 @@ if (profileDetails) {
 
 async function loadProfile() {
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token")
     const message = document.getElementById("message");
     const profileDetails =
         document.getElementById("profileDetails");
@@ -126,10 +139,10 @@ async function loadProfile() {
 
             if (response.status === 401) {
 
-                localStorage.removeItem("token");
-                localStorage.removeItem("userId");
-                localStorage.removeItem("name");
-                localStorage.removeItem("email");
+                sessionStorage.removeItem("token");
+                sessionStorage.removeItem("userId");
+                sessionStorage.removeItem("name");
+                sessionStorage.removeItem("email");
 
                 message.textContent =
                     "Session expired. Please login again.";
@@ -223,7 +236,7 @@ if (saveProfileButton) {
         async function () {
 
             const token =
-                localStorage.getItem("token");
+                sessionStorage.getItem("token");
 
             const message =
                 document.getElementById("message");
@@ -310,7 +323,7 @@ if (saveProfileButton) {
 async function loadSkills() {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     const skillSelect =
         document.getElementById("skillSelect");
@@ -362,7 +375,7 @@ async function loadSkills() {
 async function loadMySkills() {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     const skillsList =
         document.getElementById("mySkillsList");
@@ -501,7 +514,7 @@ async function loadMySkills() {
 async function addSkill() {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -590,7 +603,7 @@ async function editSkill(
 ) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -667,7 +680,7 @@ async function editSkill(
 async function deleteSkill(userSkillId) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -728,7 +741,7 @@ async function deleteSkill(userSkillId) {
 async function loadMatches() {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     const matchesMessage =
         document.getElementById("matchesMessage");
@@ -866,7 +879,7 @@ async function requestSession(
 ) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -925,7 +938,7 @@ async function requestSession(
 async function loadSessionRequests() {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     const requestsMessage =
         document.getElementById("requestsMessage");
@@ -1204,7 +1217,7 @@ function showScheduleForm(sessionRequestId) {
 async function scheduleSession(sessionRequestId) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -1345,7 +1358,7 @@ async function updateSessionRequest(
 ) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -1463,10 +1476,10 @@ document.addEventListener(
 async function loadUpcomingSessions() {
 
     const userId =
-        localStorage.getItem("userId");
+        sessionStorage.getItem("userId")
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token")
 
     if (!userId || !token) {
         return;
@@ -1536,7 +1549,7 @@ async function loadUpcomingSessions() {
                 "session-card";
 
             const joined =
-                session.learnerJoinedAt;
+                session.currentUserJoinedAt;
 
             sessionDiv.innerHTML = `
 
@@ -1604,25 +1617,30 @@ async function loadUpcomingSessions() {
 
                 <div class="session-action">
 
-                    ${joined
+    ${joined
                     ? `
-                                <div class="joined-message">
-                                    ✓ You have joined
-                                </div>
-                              `
+            <div class="joined-message">
+                ✓ You have joined
+            </div>
+
+            <button
+                type="button"
+                class="complete-session-button"
+                onclick="completeSession(${session.sessionId})">
+                Mark as Completed
+            </button>
+          `
                     : `
-                                <button
-                                    type="button"
-                                    class="join-session-button"
-                                    onclick="joinSession(
-                                        ${session.sessionId}
-                                    )">
-                                    Join Session
-                                </button>
-                              `
+            <button
+                type="button"
+                class="join-session-button"
+                onclick="joinSession(${session.sessionId})">
+                Join Session
+            </button>
+          `
                 }
 
-                </div>
+</div>
             `;
 
             container.appendChild(sessionDiv);
@@ -1638,12 +1656,64 @@ async function loadUpcomingSessions() {
             "<p>Unable to load upcoming sessions.</p>";
     }
 }
+async function joinSession(sessionId) {
 
+    const token =
+        sessionStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login again.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `https://localhost:7121/api/Sessions/${sessionId}/join`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization":
+                        `Bearer ${token}`
+                }
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok) {
+            alert(
+                data.message ||
+                "Unable to join session."
+            );
+            return;
+        }
+
+        alert(
+            "You joined the session successfully!"
+        );
+
+        // Reload upcoming sessions
+        await loadUpcomingSessions();
+
+    } catch (error) {
+
+        console.error(
+            "Join session error:",
+            error
+        );
+
+        alert(
+            "Unable to join the session."
+        );
+    }
+}
 
 async function joinSession(sessionId) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         alert("Please login first.");
@@ -1692,12 +1762,60 @@ async function joinSession(sessionId) {
         );
     }
 }
+async function completeSession(sessionId) {
 
+    const token = sessionStorage.getItem("token");
+
+    if (!token) {
+        alert("Please login again.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `https://localhost:7121/api/Sessions/${sessionId}/complete`,
+            {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            alert(
+                data.message ||
+                "Unable to complete session."
+            );
+            return;
+        }
+
+        alert(
+            "Session completion recorded successfully!"
+        );
+
+        await loadUpcomingSessions();
+
+    } catch (error) {
+
+        console.error(
+            "Complete session error:",
+            error
+        );
+
+        alert(
+            "Unable to complete the session."
+        );
+    }
+}
 
 async function loadReviews(userId) {
 
     const token =
-        localStorage.getItem("token");
+        sessionStorage.getItem("token");
 
     if (!token) {
         return;
@@ -1819,5 +1937,559 @@ async function loadReviews(userId) {
     }
 }
 
+// ================= FORGOT PASSWORD =================
 
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+const forgotPasswordSection = document.getElementById("forgotPasswordSection");
+const resetPasswordButton = document.getElementById("resetPasswordButton");
+const backToLoginLink = document.getElementById("backToLoginLink");
+
+let resetToken = null;
+
+// Show Forgot Password section
+if (forgotPasswordLink) {
+    forgotPasswordLink.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        document.getElementById("loginForm").style.display = "none";
+        forgotPasswordSection.style.display = "block";
+    });
+}
+
+// Back to Login
+if (backToLoginLink) {
+    backToLoginLink.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        forgotPasswordSection.style.display = "none";
+        document.getElementById("loginForm").style.display = "block";
+    });
+}
+
+// Generate reset token
+if (resetPasswordButton) {
+    resetPasswordButton.addEventListener("click", async function () {
+
+        const email = document.getElementById("resetEmail").value.trim();
+        const newPassword = document.getElementById("newPassword").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const message = document.getElementById("resetPasswordMessage");
+
+        if (!email || !newPassword || !confirmPassword) {
+            message.textContent = "Please fill in all fields.";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            message.textContent = "Passwords do not match.";
+            return;
+        }
+
+        try {
+            // Step 1: Get reset token
+            const forgotResponse = await fetch("/api/auth/forgot-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            });
+
+            const forgotData = await forgotResponse.json();
+
+            if (!forgotResponse.ok) {
+                message.textContent =
+                    forgotData.message || "No account found with this email.";
+                return;
+            }
+
+            resetToken = forgotData.token;
+
+            // Step 2: Reset password
+            const resetResponse = await fetch("/api/auth/reset-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    token: resetToken,
+                    newPassword: newPassword
+                })
+            });
+
+            const resetData = await resetResponse.text();
+
+            if (!resetResponse.ok) {
+                message.textContent = resetData || "Password reset failed.";
+                return;
+            }
+
+            message.textContent = "Password reset successfully!";
+
+            setTimeout(() => {
+                forgotPasswordSection.style.display = "none";
+                document.getElementById("loginForm").style.display = "block";
+            }, 1500);
+
+        } catch (error) {
+            console.error(error);
+            message.textContent = "Something went wrong. Please try again.";
+        }
+    });
+}
+
+async function submitReview() {
+
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userId");
+
+    const sessionId =
+        document.getElementById("reviewSessionId").value;
+
+    const reviewedUserId =
+        document.getElementById("reviewedUserId").value;
+
+    const rating =
+        document.getElementById("reviewRating").value;
+
+    const comment =
+        document.getElementById("reviewComment").value.trim();
+
+    const message =
+        document.getElementById("reviewMessage");
+
+
+    if (!token || !userId) {
+
+        message.textContent =
+            "Please login again.";
+
+        return;
+    }
+
+
+    if (!sessionId || !reviewedUserId) {
+
+        message.textContent =
+            "Session information is missing.";
+
+        return;
+    }
+
+
+    if (!rating) {
+
+        message.textContent =
+            "Please select a rating.";
+
+        return;
+    }
+
+
+    if (!comment) {
+
+        message.textContent =
+            "Please enter your review.";
+
+        return;
+    }
+
+
+    try {
+
+        const response = await fetch(
+            "/api/Reviews",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization":
+                        "Bearer " + token
+                },
+
+                body: JSON.stringify({
+
+                    sessionId:
+                        Number(sessionId),
+
+                    reviewedUserId:
+                        Number(reviewedUserId),
+
+                    rating:
+                        Number(rating),
+
+                    comment:
+                        comment
+                })
+            }
+        );
+
+
+        const resultText =
+            await response.text();
+
+        let result;
+
+        try {
+
+            result =
+                JSON.parse(resultText);
+
+        } catch {
+
+            result =
+                resultText;
+        }
+
+
+        if (!response.ok) {
+
+            message.textContent =
+                typeof result === "string"
+                    ? result
+                    : result.message ||
+                    "Unable to submit review.";
+
+            return;
+        }
+
+
+        message.textContent =
+            "Review submitted successfully!";
+
+
+        document.getElementById(
+            "reviewRating"
+        ).value = "";
+
+
+        document.getElementById(
+            "reviewComment"
+        ).value = "";
+
+
+        // Hide review form after successful submission
+        document.getElementById(
+            "sessionReviewSection"
+        ).style.display = "none";
+
+
+        // Refresh received reviews
+        await loadReviews(userId);
+
+    }
+    catch (error) {
+
+        console.error(
+            "Submit review error:",
+            error
+        );
+
+        message.textContent =
+            "Unable to submit review. Please try again.";
+    }
+}
+
+
+
+async function loadCompletedSessions() {
+    const userId = sessionStorage.getItem("userId");
+    const token = sessionStorage.getItem("token");
+
+    if (!userId || !token) return;
+
+    try {
+        const response = await fetch(
+            `https://localhost:7121/api/Sessions/completed/${userId}`,
+            {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            }
+        );
+
+        if (!response.ok) {
+            console.error("Unable to load completed sessions.");
+            return;
+        }
+
+        const sessions = await response.json();
+
+        console.log("Completed sessions:", sessions);
+
+        if (!sessions || sessions.length === 0) {
+            document.getElementById("sessionReviewSection").style.display = "none";
+            return;
+        }
+
+        const currentUserId = Number(userId);
+
+        // Find the first completed session that the user has NOT reviewed
+        let sessionToReview = null;
+
+        for (const session of sessions) {
+
+            const reviewResponse = await fetch(
+                `/api/Reviews/session/${session.sessionId}/mine`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                }
+            );
+
+            if (!reviewResponse.ok) {
+                console.error(
+                    "Unable to check review status for session:",
+                    session.sessionId
+                );
+                continue;
+            }
+
+            const reviewStatus = await reviewResponse.json();
+
+            console.log(
+                "Review status for session",
+                session.sessionId,
+                ":",
+                reviewStatus
+            );
+
+            if (!reviewStatus.exists) {
+                sessionToReview = session;
+                break;
+            }
+        }
+
+        // All completed sessions have already been reviewed
+        if (!sessionToReview) {
+            document.getElementById("sessionReviewSection").style.display = "none";
+            return;
+        }
+
+        let reviewedUserId;
+
+        if (Number(sessionToReview.requesterUserId) === currentUserId) {
+            reviewedUserId = sessionToReview.receiverUserId;
+        } else {
+            reviewedUserId = sessionToReview.requesterUserId;
+        }
+
+        document.getElementById("reviewSessionId").value =
+            sessionToReview.sessionId;
+
+        document.getElementById("reviewedUserId").value =
+            reviewedUserId;
+
+        document.getElementById("sessionReviewSection").style.display =
+            "block";
+
+    } catch (error) {
+        console.error("Load completed sessions error:", error);
+    }
+}
+// ================= DASHBOARD =================
+
+async function loadDashboard() {
+
+    const userId = sessionStorage.getItem("userId");
+    const token = sessionStorage.getItem("token");
+
+    if (!userId || !token) {
+        return;
+    }
+
+    const headers = {
+        "Authorization": "Bearer " + token
+    };
+
+    try {
+
+        // My Skills
+        const skillsResponse = await fetch(
+            "/api/UserSkills",
+            {
+                headers: headers
+            }
+        );
+
+        if (skillsResponse.ok) {
+
+            const skills = await skillsResponse.json();
+
+            document.getElementById("skillsCount").textContent =
+                skills.length;
+
+            const skillsContainer =
+                document.getElementById("mySkills");
+
+            if (skillsContainer && skills.length > 0) {
+
+                skillsContainer.innerHTML = skills.map(skill => `
+                    <div class="skill-card">
+                        <h3>${skill.skillName}</h3>
+                        <span>${skill.skillType}</span>
+                        <p>${skill.skillLevel || ""}</p>
+                    </div>
+                `).join("");
+
+            }
+        }
+
+
+        // Upcoming Sessions
+        const sessionsResponse = await fetch(
+            `https://localhost:7121/api/Sessions/upcoming/${userId}`,
+            {
+                headers: headers
+            }
+        );
+
+        if (sessionsResponse.ok) {
+
+            const sessions = await sessionsResponse.json();
+
+            document.getElementById("sessionsCount").textContent =
+                sessions.length;
+
+            const sessionsContainer =
+                document.getElementById("upcomingSessions");
+
+            if (sessionsContainer && sessions.length > 0) {
+
+                sessionsContainer.innerHTML = sessions.map(session => `
+                    <div class="session-card">
+
+                        <h3>Skill Exchange Session</h3>
+
+                        <p>
+                            <strong>Date:</strong>
+                            ${session.scheduledDate.split("T")[0]}
+                        </p>
+
+                        <p>
+                            <strong>Time:</strong>
+                            ${session.startTime}
+                        </p>
+
+                        <p>
+                            <strong>Duration:</strong>
+                            ${session.durationMinutes} minutes
+                        </p>
+
+                        <span class="session-status">
+                            ${session.status}
+                        </span>
+
+                    </div>
+                `).join("");
+
+            }
+        }
+
+
+        // Session Requests
+        const requestsResponse = await fetch(
+            "/api/SessionRequests",
+            {
+                headers: headers
+            }
+        );
+
+        if (requestsResponse.ok) {
+
+            const requests = await requestsResponse.json();
+
+            document.getElementById("requestsCount").textContent =
+                requests.length;
+
+            const requestsContainer =
+                document.getElementById("sessionRequests");
+
+            if (requestsContainer && requests.length > 0) {
+
+                requestsContainer.innerHTML = requests.map(request => `
+                    <div class="request-card">
+
+                        <h3>${request.requesterName}</h3>
+
+                        <p>
+                            Skill: ${request.skillName}
+                        </p>
+
+                        <span class="status-badge">
+                            ${request.status}
+                        </span>
+
+                    </div>
+                `).join("");
+
+            }
+        }
+
+
+        // Reviews
+        const reviewsResponse = await fetch(
+            `/api/Reviews/user/${userId}`,
+            {
+                headers: headers
+            }
+        );
+
+        if (reviewsResponse.ok) {
+
+            const reviews = await reviewsResponse.json();
+
+            document.getElementById("reviewsCount").textContent =
+                reviews.length;
+        }
+
+
+        // User name
+        const userName =
+            sessionStorage.getItem("name");
+
+        if (userName) {
+
+            document.getElementById(
+                "dashboardUserName"
+            ).textContent = userName;
+
+            document.getElementById(
+                "userAvatar"
+            ).textContent =
+                userName.charAt(0).toUpperCase();
+        }
+
+    }
+    catch (error) {
+
+        console.error(
+            "Dashboard loading error:",
+            error
+        );
+    }
+}
+
+
+// Load dashboard only when Dashboard elements exist
+if (document.getElementById("skillsCount")) {
+    loadDashboard();
+}
+
+function logout() {
+
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("name");
+    sessionStorage.removeItem("email");
+
+    window.location.href = "login.html";
+}
 loadUpcomingSessions();
+loadCompletedSessions();

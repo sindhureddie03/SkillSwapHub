@@ -69,6 +69,28 @@ namespace SkillSwapHub.API.Repositories
             return (int)await command.ExecuteScalarAsync();
         }
 
+        public async Task<bool> HasReviewAsync(int sessionId, int reviewerId)
+        {
+            using var connection = _dbConnectionFactory.CreateConnection();
+
+            string query = @"
+        SELECT COUNT(1)
+        FROM Reviews
+        WHERE SessionId = @SessionId
+          AND ReviewerId = @ReviewerId";
+
+            using var command = new SqlCommand(query, connection);
+
+            command.Parameters.AddWithValue("@SessionId", sessionId);
+            command.Parameters.AddWithValue("@ReviewerId", reviewerId);
+
+            await connection.OpenAsync();
+
+            int count = Convert.ToInt32(await command.ExecuteScalarAsync());
+
+            return count > 0;
+        }
+
         public async Task<List<Review>> GetReviewsForUserAsync(
     int userId)
         {

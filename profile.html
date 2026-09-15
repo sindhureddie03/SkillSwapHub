@@ -3,19 +3,20 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
- 
+
     <title>Profile - SkillSwap Hub</title>
 
     <link rel="stylesheet" href="Style.css">
-    
 
 </head>
 
+
 <body>
 
-   
+
     <!-- Navigation -->
 
     <header class="site-header">
@@ -23,17 +24,26 @@
         <div class="navbar">
 
             <a href="index.html" class="brand">
+
                 <span class="brand-icon">S</span>
+
                 <span>SkillSwap Hub</span>
+
             </a>
 
+
             <nav>
+
                 <a href="index.html">Home</a>
+
                 <a href="profile.html" class="active">Profile</a>
+
                 <a href="login.html">Login</a>
+
                 <a href="register.html" class="register-link">
                     Get Started
                 </a>
+
             </nav>
 
         </div>
@@ -41,9 +51,11 @@
     </header>
 
 
+
     <!-- Main Profile -->
 
     <main class="profile-page">
+
 
         <!-- Page Header -->
 
@@ -66,6 +78,7 @@
         </section>
 
 
+
         <!-- Profile Information -->
 
         <section class="profile-section">
@@ -82,13 +95,17 @@
 
                 </div>
 
+
                 <button type="button"
                         id="editProfileButton"
                         class="primary-button">
+
                     Edit Profile
+
                 </button>
 
             </div>
+
 
 
             <p id="message" class="profile-message">
@@ -96,9 +113,11 @@
             </p>
 
 
+
             <div id="profileDetails"
                  class="profile-details">
             </div>
+
 
 
             <!-- Edit Profile -->
@@ -122,7 +141,9 @@
                 </div>
 
 
+
                 <div class="profile-form-grid">
+
 
                     <div class="form-group full-width">
 
@@ -135,6 +156,7 @@
                                placeholder="Tell others about yourself">
 
                     </div>
+
 
 
                     <div class="form-group">
@@ -150,6 +172,7 @@
                     </div>
 
 
+
                     <div class="form-group">
 
                         <label for="availability">
@@ -161,6 +184,7 @@
                                placeholder="Weekdays, Weekends, Evenings">
 
                     </div>
+
 
 
                     <div class="form-group">
@@ -178,12 +202,15 @@
                 </div>
 
 
+
                 <div class="profile-form-actions">
 
                     <button type="button"
                             id="saveProfileButton"
                             class="primary-button">
+
                         Save Profile
+
                     </button>
 
                 </div>
@@ -191,6 +218,7 @@
             </div>
 
         </section>
+
 
 
         <!-- My Skills -->
@@ -216,7 +244,9 @@
             </div>
 
 
+
             <div class="skill-form-card">
+
 
                 <div class="form-group">
 
@@ -233,6 +263,7 @@
                     </select>
 
                 </div>
+
 
 
                 <div class="form-group">
@@ -254,6 +285,7 @@
                     </select>
 
                 </div>
+
 
 
                 <div class="form-group">
@@ -285,13 +317,17 @@
                 </div>
 
 
+
                 <button type="button"
                         id="addSkillButton"
                         class="primary-button">
+
                     Add Skill
+
                 </button>
 
             </div>
+
 
 
             <div id="mySkillsList"
@@ -299,6 +335,7 @@
             </div>
 
         </section>
+
 
 
         <!-- Skill Matches -->
@@ -324,10 +361,14 @@
             </div>
 
 
+
             <p id="matchesMessage"
                class="section-message">
+
                 Loading matches...
+
             </p>
+
 
 
             <div id="matchesList"
@@ -335,6 +376,7 @@
             </div>
 
         </section>
+
 
 
         <!-- Session Requests -->
@@ -360,10 +402,14 @@
             </div>
 
 
+
             <p id="requestsMessage"
                class="section-message">
+
                 Loading requests...
+
             </p>
+
 
 
             <div id="requestsList"
@@ -371,6 +417,7 @@
             </div>
 
         </section>
+
 
 
         <!-- Upcoming Sessions -->
@@ -397,6 +444,7 @@
             </div>
 
 
+
             <div id="sessionsContainer"
                  class="sessions-container">
 
@@ -409,7 +457,137 @@
         </section>
 
 
-        <!-- Reviews -->
+
+        <!-- Rate & Review -->
+
+        <section id="sessionReviewSection"
+                 class="dashboard-section review-form-section"
+                 style="display: none;">
+
+            <div class="section-title-row">
+
+                <div>
+
+                    <span class="section-label">
+                        SESSION FEEDBACK
+                    </span>
+
+                    <h2>Rate & Review</h2>
+
+                    <p>
+                        Your session is completed. Share your experience with the other participant.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <div id="reviewFormContainer">
+
+
+                <div class="review-form-card">
+
+
+                    <h3>How was your session?</h3>
+
+
+                    <!-- Hidden Session Information -->
+
+                    <input type="hidden"
+                           id="reviewSessionId">
+
+
+                    <input type="hidden"
+                           id="reviewedUserId">
+
+
+
+                    <!-- Rating -->
+
+                    <div class="review-field">
+
+                        <label for="reviewRating">
+                            Rating
+                        </label>
+
+
+                        <select id="reviewRating">
+
+                            <option value="">
+                                Select rating
+                            </option>
+
+                            <option value="5">
+                                ⭐⭐⭐⭐⭐ Excellent
+                            </option>
+
+                            <option value="4">
+                                ⭐⭐⭐⭐ Good
+                            </option>
+
+                            <option value="3">
+                                ⭐⭐⭐ Average
+                            </option>
+
+                            <option value="2">
+                                ⭐⭐ Poor
+                            </option>
+
+                            <option value="1">
+                                ⭐ Very Poor
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+
+                    <!-- Comment -->
+
+                    <div class="review-field">
+
+                        <label for="reviewComment">
+                            Your Review
+                        </label>
+
+
+                        <textarea id="reviewComment"
+                                  rows="4"
+                                  placeholder="Share your experience with this session..."></textarea>
+
+                    </div>
+
+
+
+                    <!-- Submit -->
+
+                    <button type="button"
+                            id="submitReviewButton"
+                            class="primary-button"
+                            onclick="submitReview()">
+
+                        Submit Review
+
+                    </button>
+
+
+
+                    <p id="reviewMessage"
+                       class="section-message">
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- Reviews & Ratings -->
 
         <section class="dashboard-section reviews-section">
 
@@ -432,6 +610,7 @@
             </div>
 
 
+
             <div id="reviewsContainer"
                  class="reviews-grid">
 
@@ -443,7 +622,9 @@
 
         </section>
 
+
     </main>
+
 
 
     <!-- Footer -->
@@ -451,6 +632,7 @@
     <footer class="site-footer">
 
         <div class="footer-content">
+
 
             <div>
 
@@ -462,6 +644,8 @@
 
             </div>
 
+
+
             <p>
                 © 2026 SkillSwap Hub. All rights reserved.
             </p>
@@ -471,16 +655,26 @@
     </footer>
 
 
+
     <script src="app.js"></script>
 
+
     <script>
-        const userId = localStorage.getItem("userId");
+
+        const userId = sessionStorage.getItem("userId");
+
+        
 
         if (userId) {
+
             loadReviews(userId);
+
+            loadCompletedSessions();
+
         }
+
     </script>
-    
+
 
 </body>
 
